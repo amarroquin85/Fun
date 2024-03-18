@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-
+from selenium.webdriver.common.keys import Keys
+import time
 service = Service('C:\\Users\\alexm\\OneDrive\\Desktop\\ITprojects\\Projects\\Fun\\python_automation\\Selenium\\chromedriver.exe')
 
 def get_driver():
@@ -13,14 +14,24 @@ def get_driver():
     options.add_argument("no-sandbox")
     options.add_experimental_option("excludeSwitches",["enable-automation"])
     options.add_argument("disable-blink-features=AutomationControlled")
+    options.add_experimental_option('excludeSwitches',['enable-logging'])
     driver= webdriver.Chrome(service=service,options=options)
-    driver.get("http://automated.pythonanywhere.com")
     return driver
-
+def clean_text(text):
+    """Extract only the temperature from the text"""
+    output = float(text.split(":")[1])
+    return output
 def main():
     driver = get_driver()
-    element = driver.find_element(by="xpath",value="/html/body/div[1]/div/h1[1]")
-    return element.text
-
-print(main())
+    driver.get("http://automated.pythonanywhere.com/login/")
+    time.sleep(3)
+    driver.find_element(by="id",value="id_username").send_keys("automated")
+    driver.find_element(by="id",value="id_password").send_keys("automatedautomated" + Keys.RETURN)
+    driver.find_element(by="xpath", value="/html/body/nav/div/a").click()
+    time.sleep(2)
+    text = driver.find_element(by="id",value="displaytimer").text
+    
+    print(text)
+    print(clean_text(text))
+main()
     
